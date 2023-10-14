@@ -20,7 +20,7 @@ void main() {
     vec3 offset_pos = v_color0.xyz;
     offset_pos.xz += parallax;
     vec4 color2 = render_clouds(v_dir, offset_pos, v_color1.a, v_color2.a*2.0, v_color2.rgb, v_color1.rgb);
-    color = mix(color2, color, 0.2 + 0.8*color.a);
+    color = mix(color2, color, color.a);
   #endif
 
   #ifdef NL_AURORA

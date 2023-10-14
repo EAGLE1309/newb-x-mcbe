@@ -1,13 +1,16 @@
-# newb-x-mcbe
+# Newb X Legacy - Always Reflection
 
-Newb X Legacy is a ported version of [newb-shader-mcbe](https://github.com/devendrn/newb-shader-mcbe) for MCBE 1.20. It is a vanilla shader based on the theme "lightweight and soft aesthetics".
+Newb X Legacy - Always Reflection is a ported version of [newb-x-mcbe](https://github.com/devendrn/newb-x-mcbe) for MCBE/Minecraft Pocket Edition 1.20. It is a vanilla shader based on the theme "lightweight and soft aesthetics".
+
+![Always Reflection Logo](https://ik.imagekit.io/eagledev/always_reflection_qqYSF4-zS.png?updatedAt=1695387313030)
 
 > Note:
 This is an experimental repository, breaking changes are made often.
+Also, there is no guarantee of continued development.
 
 ## Screenshot
 
-![Screenshot1](docs/screenshots.jpg "Newb X Legacy 15b2, MCBE 1.20.12")
+![Screenshot](https://ik.imagekit.io/eagledev/Always%20Reflection%20Screenshots.jpg?updatedAt=1695387864707)
 
 ## Downloads
 

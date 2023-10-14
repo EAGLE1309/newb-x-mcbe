@@ -66,7 +66,12 @@ void main() {
   bool nether = detectNether(FogColor.rgb, FogAndDistanceControl.xy);
   bool underWater = detectUnderwater(FogColor.rgb, FogAndDistanceControl.xy);
   float rainFactor = detectRain(FogAndDistanceControl.xyz);
-
+  
+  // shade for rain during Always Reflection
+  #ifdef NL_ALWAYS_REFLECTION
+    shade = mix(1.0, shade, rainFactor);
+  #endif
+  
   // sky colors
   vec3 zenithCol;
   vec3 horizonCol;

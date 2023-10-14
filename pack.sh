@@ -15,28 +15,37 @@ DEFAULT_MATERIALS="RenderChunk Clouds Sky EndSky LegacyCubemap Actor"
 #  NAMES     = names/descriptions for options
 #  MATERIALS = materials to compile for options
 SUBPACK_OPTIONS=(
-  ROUNDED_CLOUDS
-  CHUNK_ANIM
-  NO_WAVE_NO_FOG
-  NO_FOG
-  NO_WAVE
   DEFAULT
+  NO_WAVE
+  NO_FOG
+  NO_WAVE_NO_FOG
+  CHUNK_ANIM
+  ALWAYS_REFLECTION
+  AR_SPECTRUM
+  AR_NEON_CLOUDS
+  AR_BETTER_CLOUDS
 )
 SUBPACK_NAMES=(
-  "Rounded Clouds"
-  "Chunk loading animation"
-  "No wave, No fog"
-  "No fog"
-  "No wave"
-  "Default"
+  "§bDefault"
+  "§bNo wave"
+  "§bNo fog"
+  "§bNo wave, No fog"
+  "§bChunk loading animation"
+  "§bOptimised Always Reflection§r\n- Recommended for low end devices"
+  "§bAlways Reflection - Spectrum§r\n- Not recommended for low end devices\n- Chunk Loading animation\n- Always Reflection\n- Better Aurora (Emissive and different colors)\n- Less Vanilla water texture\n- Better Aurora Velocity"
+  "§bAlways Reflection - Neon clouds§r\n-Always Reflection\n- Neon Clouds (Night time)"
+  "§bAlways Reflection with Better Clouds"
 )
 SUBPACK_MATERIALS=(
-  "Clouds"
   "RenderChunk"
   "RenderChunk"
   "RenderChunk"
   "RenderChunk"
-  ""
+  "RenderChunk"
+  "RenderChunk"
+  "RenderChunk Clouds"
+  "RenderChunk Clouds"
+  "RenderChunk Clouds"
 )
 
 BUILD_SCRIPT="./build.sh"

@@ -145,12 +145,40 @@ float fastRand(vec2 n) {
   return fract(a+b);
 }
 
+// 2D Perlin Noise - used in water waves
+
+float perlinNoise(vec2 p){
+    vec2 ip = floor(p);
+    vec2 u = fract(p);
+    u = u*u*(3.0-2.0*u);
+
+    float res = mix(
+        mix(rand(ip),rand(ip+vec2(1.0,0.0)),u.x),
+        mix(rand(ip+vec2(0.0,1.0)),rand(ip+vec2(1.0,1.0)),u.x),u.y);
+    return res*res;
+}
+
 // water displacement map (also used by caustic)
 float disp(vec3 pos, highp float t) {
   float val = 0.5 + 0.5*sin(t*1.7 + (pos.x+pos.y)*NL_CONST_PI_HALF);
   return mix(fastRand(pos.xz), fastRand(pos.xz+vec2_splat(1.0)), val);
 }
 
+// water waves displacement map (using Perlin noise)
+// Include a Perlin noise function
+float perlinNoise(vec2 p);
+
+float wavesDisp(vec3 pos, highp float t){
+  vec2 xy = pos.xz;
+  float val = 0.5 + 0.5 * sin(t * 1.7 + (xy.x + xy.y) * NL_CONST_PI_HALF);
+
+  // Generate Perlin noise values based on the position
+  float noise1 = perlinNoise(xy);
+  float noise2 = perlinNoise(xy + vec2(1.0));
+
+  // Use the generated noise values to add randomness to the displacement
+  return mix(noise1, noise2, val);
+}
 
 /* FOG */
 
@@ -275,11 +303,10 @@ vec3 getSunRefl(float viewDirX, float fog_brightness, vec3 FOG_COLOR) {
   return fog_brightness*sunRefl*vec3(2.5,1.6,0.8);
 }
 
-// fresnel - Schlick's approximation
+// Improved Fresnel approximation
 float calculateFresnel(float cosR, float r0) {
-  float a = 1.0-cosR;
-  float a2 = a*a;
-  return r0 + (1.0-r0)*a2*a2*a;
+  float F = r0 + (1.0 - r0) * pow(1.0 - cosR, 5.0);
+  return F;
 }
 
 
@@ -400,7 +427,13 @@ vec4 render_aurora(vec3 p, float t, float rain, vec3 sky_col) {
   d2 = d0/(1.0 + d2/NL_AURORA_WIDTH);
 
   float mask = (1.0-0.8*rain)/(1.0 + 64.0*sky_col.b*sky_col.b);
-  return vec4(NL_AURORA*mix(NL_AURORA_COL1,NL_AURORA_COL2,d1),1.0)*d2*mask;
+  float neoncol = 1.0; //default value
+  
+  #ifdef NL_NEON_CLOUDS
+    neoncol *= 100.0;
+  #endif
+  
+  return vec4(NL_AURORA*mix(NL_AURORA_COL1,NL_AURORA_COL2,d1)*neoncol,1.0)*d2*mask;
 }
 #endif
 
@@ -550,7 +583,7 @@ vec4 nl_water(inout vec3 wPos, inout vec4 color, vec3 viewDir, vec3 light, vec3 
     waterRefl = zenithCol*uv1.y*uv1.y*1.3;
   }
 
-  float fresnel = calculateFresnel(cosR, 0.03);
+  float fresnel = calculateFresnel(cosR, 0.1);
   float opacity = 1.0-cosR;
 
 #ifdef NL_WATER_FOG_FADE
@@ -676,36 +709,52 @@ float nl_windblow(vec2 p, float t){
 vec4 nl_refl(inout vec4 color, inout vec4 mistColor, vec2 lit, vec2 uv1, vec3 tiledCpos,
              float camDist, vec3 wPos, vec3 viewDir, vec3 torchColor, vec3 horizonCol,
              vec3 zenithCol, float rainFactor, float render_dist, highp float t, vec3 pos) {
-  vec4 wetRefl = vec4(0.0,0.0,0.0,0.0);
-  if (rainFactor > 0.0) {
-    float wetness = lit.y*lit.y*rainFactor;
+  vec4 wetRefl = vec4(0.0, 0.0, 0.0, 0.0);
+  float wetness = lit.y * (lit.y * 0.9);
 
-#ifdef NL_RAIN_MIST_OPACITY
-    // humid air blow
-    float humidAir = wetness*nl_windblow(pos.xy/(1.0+pos.z), t);
-    mistColor.a = min(mistColor.a + humidAir*NL_RAIN_MIST_OPACITY, 1.0);
-#endif
-
-    float endDist = render_dist*0.6;
-    if (camDist < endDist) {
-
-      // puddles map
-      wetness *= 0.4 + 0.6*fastRand(tiledCpos.xz*1.4);
-
-      float cosR = max(viewDir.y, 0.0);
-      wetRefl.rgb = getRainSkyRefl(horizonCol, zenithCol, cosR);
-      wetRefl.a = calculateFresnel(cosR, 0.03)*wetness;
-
-      // torch light
-      wetRefl.rgb += torchColor*lit.x*NL_TORCH_INTENSITY;
-
-      // hide effect far from player
-      wetRefl.a *= clamp(2.0-2.0*camDist/endDist, 0.0, 1.0);
+  #ifdef NL_RAIN_MIST_OPACITY
+    if (rainFactor > 0.0) {
+      // humid air blow
+      float humidAir = wetness * rainFactor * nl_windblow(pos.xy / (1.0 + pos.z), t);
+      mistColor.a = min(mistColor.a + humidAir * NL_RAIN_MIST_OPACITY, 1.0);
     }
+  #endif
+  
+  #ifndef NL_ALWAYS_REFLECTION
+    if (rainFactor < 0.001)
+      return wetRefl;
+  #endif
 
-    // darken wet parts
-    color.rgb *= 1.0 - 0.4*wetness;
+  float endDist = render_dist * 0.5;
+  if (camDist < endDist) {
+    float cosR = max(viewDir.y, 0.0);
+    wetRefl.rgb = getRainSkyRefl(horizonCol, zenithCol, cosR);
+    wetRefl.a = calculateFresnel(cosR, 0.05);
+
+    // Improved puddles
+    float strength = 1.2;  // Controls the strength of the puddles (lower for smaller puddles)
+    
+    // Calculate the new puddle value using a slower-changing factor (e.g., 2.0 * t)
+    float newPuddleOffset = disp(tiledCpos.xyz, t * 2.8) ;
+    float puddles = 0.4 + strength *  newPuddleOffset;
+    
+    #ifdef NL_ALWAYS_REFLECTION
+      wetness *= mix(1.0, puddles, rainFactor);
+      wetRefl.a *= wetness;
+    #else
+      wetness *= puddles;
+      wetRefl.a *= wetness * rainFactor;
+    #endif
+    
+    // torch light
+    wetRefl.rgb += torchColor * lit.x * NL_TORCH_INTENSITY;
+
+    // hide effect far from player
+    wetRefl.a *= clamp(2.0 - 1.8 * camDist / endDist, 0.0, 1.0);
   }
+
+  // darken wet parts
+  color.rgb *= 1.0 - 0.4 * wetness * rainFactor;
   return wetRefl;
 }
 
