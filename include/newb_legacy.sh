@@ -174,7 +174,7 @@ float wavesDisp(vec3 pos, highp float t){
 
   // Generate Perlin noise values based on the position
   float noise1 = perlinNoise(xy);
-  float noise2 = perlinNoise(xy + vec2(1.0));
+  float noise2 = perlinNoise(xy + vec2_splat(1.0));
 
   // Use the generated noise values to add randomness to the displacement
   return mix(noise1, noise2, val);
