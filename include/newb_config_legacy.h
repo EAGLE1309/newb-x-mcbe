@@ -74,7 +74,7 @@
 #define NL_DAY_SKY_CLARITY 0.3 // 0.0 (fogy sky) - 1.0 (clear sky)
 
 /* Ore glow intensity */
-#define NL_GLOW_TEX 10.5 // 0.4 (weak) - 8.0 (bright)
+#define NL_GLOW_TEX 10.0 // 0.4 (weak) - 8.0 (bright)
 
 /* Plants wave intensity (toggle) */
 #define NL_PLANTS_WAVE 0.04 // 0.02 (gentle) - 0.4 (violent)
