@@ -83,8 +83,8 @@
 #define NL_WAVE_SPEED 2.8 // 0.5 (slow) - 5.0 (very fast)
 
 /* Water */
-#define NL_WATER_TRANSPARENCY 0.9 // 0.0 (transparent) - 1.0 (normal)
-#define NL_WATER_BUMP 0.07        // 0.001 (plain) - 0.2 (bumpy water)
+#define NL_WATER_TRANSPARENCY 0.3 // 0.0 (transparent) - 1.0 (normal)
+#define NL_WATER_BUMP 0.2        // 0.001 (plain) - 0.2 (bumpy water)
 #define NL_WATER_TINT vec3(0.52,0.9,0.45)
 #define NL_WATER_WAVE     // (toggle) wave effect
 #define NL_WATER_FOG_FADE // (toggle) disable fog fade for water
