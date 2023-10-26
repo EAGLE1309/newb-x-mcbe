@@ -31,7 +31,7 @@
 /* -------- CONFIG STARTS HERE ----------- */
 
 /* Tonemap type */
-#define NL_TONEMAP_TYPE 3 // 1:Exponential, 2:Reinhard, 3:Extended Reinhard, 4:ACES
+#define NL_TONEMAP_TYPE 2 // 1:Exponential, 2:Reinhard, 3:Extended Reinhard, 4:ACES
 
 /* Color correction options (toggle) */
 #define NL_EXPOSURE 1.2   // 0.5 (dark) - 2.0 (bright)
